@@ -20,3 +20,4 @@ PNADcontinua <- function(dadosPNAD, inputPNAD){
         # read PNAD data
         PNAD <<- read_fwf(dadosPNAD, fwf_positions(dic$start, dic$end, dic$varname))
 }
+
