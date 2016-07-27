@@ -19,7 +19,7 @@ PNADanual <- function(dicionario, dados, pessoas = TRUE){
         if(pessoas == TRUE){
                 
                 tamanho <- dicpes2014$tamanho2
-                tamanho[3] <- 6
+                tamanho[3] <- 6  # correction for glitch in 2014 data. De-activate if needed.
                 start1 <- cumsum(tamanho)-tamanho+1
                 end1 <- cumsum(tamanho)
                 dicpes2014$start <- start1
@@ -31,7 +31,7 @@ PNADanual <- function(dicionario, dados, pessoas = TRUE){
         else{
                 
                 tamanho <- dicdom2014$tamanho
-                tamanho[3] <- 6
+                tamanho[3] <- 6  # correction for glitch in 2014 data. De-activate if needed.
                 start1 <- cumsum(tamanho)-tamanho+1
                 end1 <- cumsum(tamanho)
                 dicdom2014$start <- start1
