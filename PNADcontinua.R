@@ -18,6 +18,6 @@ PNADcontinua <- function(dadosPNAD, inputPNAD){
         dic$end <- end1
         
         # read PNAD data
-        PNAD <<- read_fwf(dadosPNAD, fwf_positions(dic$start, dic$end, dic$varname))
+        PNADc <<- read_fwf(dadosPNAD, fwf_positions(dic$start, dic$end, dic$varname))
 }
 
