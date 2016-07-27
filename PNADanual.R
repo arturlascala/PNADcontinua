@@ -4,7 +4,7 @@
 # For variable 'dicionario', replace with RDA file. 
 # For 2014 it is "dicPNAD2014.Rdata"
 
-# For variable 'dicionario', replace with TXT file.
+# For variable 'dados', replace with TXT file.
 # For 2014 it is "PES2014.txt" or "DOM2014.txt"
 
 # 'Pessoas' data is default. 
