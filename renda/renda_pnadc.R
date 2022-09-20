@@ -1,5 +1,5 @@
 # DISCLAIMER
-# Este é uma análise exploratória, criada para ajudar a sanar dúvidas que eu tenho a respeito da PNAD Contínua e sua relação com a amostragem em pesquisas eleitorais. 
+# Este scripr é parte de uma análise exploratória criada para ajudar a sanar minhas dúvidas a respeito da PNAD Contínua e sua relação com a amostragem em pesquisas eleitorais. 
 # Eu não sou especialista nas bases do IBGE nem em pesquisas eleitorais. Qualquer análise decorrente deste script deve ser lida com ceticismo. 
 
 
