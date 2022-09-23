@@ -2,46 +2,44 @@
 # Este scripr é parte de uma análise exploratória criada para ajudar a sanar minhas dúvidas a respeito da PNAD Contínua e sua relação com a amostragem em pesquisas eleitorais. 
 # Eu não sou especialista nas bases do IBGE nem em pesquisas eleitorais. Qualquer análise decorrente deste script deve ser lida com ceticismo. 
 
-# DISCLAIMER 20/09/2022
-# Este script precisa de ajustes para contemplar as ponderações do DESIGN AMOSTRAL
-# NÃO USAR
 
 library(PNADcIBGE)
 library(tidyverse)
+library(srvyr)
 
-### dados preliminares
-ano <- 2021 # Preencha o ano
-trimestre <- 4 # Preencha o trimestre
-minimo <- 1100 # Preencha o valor do salário mínimo para o ano em questão (https://www.contabeis.com.br/tabelas/salario-minimo/)
+# preâmbulo
+ano <- 2022
+trimestre <- 2
+minimo <- 1100
+t0 <- Sys.time()
 
-### carrega dados da PNAD da API do IBGE
-pnadc <- get_pnadc(year = ano, quarter = trimestre, design = FALSE)
+# carrega dados da PNAD da API do IBGE
+pnadc <- get_pnadc(year = ano, quarter = trimestre, vars = c("V1008", "V2009", "VD4001","VD4019", "VD4020"))
 
-### agrega dados por domicílio, excluindo menores de 16 anos da contagem de indivíduos
-pnadc_agg <- pnadc %>% 
+# transforma os dados no formato do pacote srvyr
+pnadc <- as_survey(pnadc)
+
+# cria objeto auxiliar, com o valor de todos os rendimentos dos indivíduos agrupados por domicílio
+aux <- pnadc$variables %>% mutate(conc=paste0(UPA, V1008)) %>% group_by(conc) %>% summarise(renda_dmcl=sum(VD4020, na.rm = T))
+
+# cria a chave de relação com a base aux
+pnadc$variables <- pnadc$variables %>% mutate(conc=paste0(UPA, V1008))
+
+# left join
+pnadc$variables <- pnadc$variables %>% left_join(aux)
+    
+# categoriza a renda domiciliar nas faixas relativas ao salário mínimo
+pnadc$variables <- pnadc$variables %>%
+    mutate(faixa_dmcl=cut(renda_dmcl,
+                          breaks=c(-Inf, minimo*2, minimo*3, minimo*5, minimo*10, minimo*20, minimo*50, Inf),
+                          labels=c("0 a 2", "2 a 3", "3 a 5", "5 a 10", "10 a 20", "20 a 50", ">50")))
+
+# tabela que mostra quantos indivíduos moram em domicílios dentro da faixa de renda, filtrando apenas indivíduos com 16 anos ou mais
+resumo <- pnadc %>% 
     filter(V2009>=16) %>% 
-    group_by(UPA, V1008) %>% 
-    summarise(renda=sum(VD4019, na.rm = T), pessoas_maiores_domicilio=n()) 
+    group_by(faixa_dmcl) %>% 
+    summarise(x=survey_prop())
 
-### agrupa conforme faixas de renda
-faixas_de_renda <- pnadc_agg %>% 
-    mutate(faixa=cut(renda, 
-                     breaks=c(-Inf, minimo*2, minimo*3, minimo*5, minimo*10, minimo*20, minimo*50, Inf),
-                     labels=c("0 a 2", "2 a 3", "3 a 5", "5 a 10", "10 a 20", "20 a 50", ">50"))) %>% 
-    select(UPA, V1008, renda, faixa) 
-
-### tabela resumo: indivíduos maiores de 16 anos agrupados por faixa de renda do domicílio
-renda_domiciliar <- faixas_de_renda %>% 
-    group_by(faixa) %>% 
-    summarise(qtd=n()) %>% mutate(faixa_pct=qtd/sum(qtd))
-
-### tabela que eu SUPONHO que seja utilizada pela Quaest para estimar a proporção de indivíduos na faixa de 0 a 2 salários
-faixas_de_renda_quaest <- pnadc %>% 
-    filter(V2009>=16) %>% 
-    mutate(faixa=cut(VD4019, 
-                     breaks=c(-Inf, minimo*2, minimo*3, minimo*5, minimo*10, minimo*20, minimo*50, Inf),
-                     labels=c("0 a 2", "2 a 3", "3 a 5", "5 a 10", "10 a 20", "20 a 50", ">50"))) %>% 
-    select(VD4019, faixa) %>% 
-    group_by(faixa) %>% 
-    summarise(qtd=n()) %>% mutate(faixa_pct=qtd/sum(qtd))
+# imprime o resultado final
+print(resumo)
 
