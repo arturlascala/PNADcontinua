@@ -3,9 +3,9 @@ library(tidyverse)
 library(srvyr)
 
 # Preâmbulo
-ano <- 2022
-trimestre <- 2
-minimo <- 1212
+ano <- 2021
+trimestre <- 4
+minimo <- 1100
 
 
 pnadc <- get_pnadc(year = ano, quarter = trimestre, vars = c("V2009", "VD4019", "VD4020"))
@@ -21,7 +21,8 @@ pnadc$variables <- pnadc$variables %>%
     left_join(aux) %>% 
     mutate(faixa_dmcl=cut(renda_dmcl,
                           breaks=c(-Inf, minimo*2, minimo*3, minimo*5, minimo*10, minimo*20, minimo*50, Inf),
-                          labels=c("0 a 2", "2 a 3", "3 a 5", "5 a 10", "10 a 20", "20 a 50", ">50")))
+                          labels=c("0 a 2", "2 a 3", "3 a 5", "5 a 10", "10 a 20", "20 a 50", ">50"),
+                          right=F))
 
 resumo <- pnadc %>% 
     filter(V2009>=16) %>% 
