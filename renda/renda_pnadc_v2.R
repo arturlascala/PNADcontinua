@@ -18,7 +18,7 @@ aux <- pnadc$variables %>%
     summarise(renda_dmcl=sum(VD4020, na.rm = T))
 
 pnadc$variables <- pnadc$variables %>% 
-    left_join(aux, by = c(ID_DOMICILIO==ID_DOMICILIO)) %>% 
+    left_join(aux) %>% 
     mutate(faixa_dmcl=cut(renda_dmcl,
                           breaks=c(-Inf, minimo*2, minimo*3, minimo*5, minimo*10, minimo*20, minimo*50, Inf),
                           labels=c("0 a 2", "2 a 3", "3 a 5", "5 a 10", "10 a 20", "20 a 50", ">50"),
