@@ -3,9 +3,9 @@ library(tidyverse)
 library(srvyr)
 
 # Preâmbulo
-ano <- 2018
-trimestre <- 4
-minimo <- 954
+ano <- 2022
+trimestre <- 2
+minimo <- 1212
 
 
 pnadc <- get_pnadc(year = ano, quarter = trimestre, vars = c("V2009", "VD4019", "VD4020"))
